@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Zoom WebSDK</title>
+    <meta charset="utf-8" />
+    <link type="text/css" rel="stylesheet" href="node_modules/@zoomus/websdk/dist/css/bootstrap.css" />
+    <link type="text/css" rel="stylesheet" href="node_modules/@zoomus/websdk/dist/css/react-select.css" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="origin-trial" content="">
+</head>
+
+<body>
+
+    <script src="node_modules/react/umd/react.production.min.js"></script>
+    <script src="node_modules/react-dom/umd/react-dom.production.min.js"></script>
+    <script src="node_modules/redux/dist/redux.min.js"></script>
+    <script src="node_modules/redux-thunk/dist/redux-thunk.min.js"></script>
+    <script src="node_modules/lodash/lodash.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script> -->
+    <script src="./js/tool.js"></script>
+    <!-- <script src="./js/myscript.js"></script> -->
+    <script src="./static/meeting.min.js"></script>
+    <script>
+        const simd = async () => WebAssembly.validate(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 4, 1, 96, 0, 0, 3, 2, 1, 0, 10, 9, 1, 7, 0, 65, 0, 253, 15, 26, 11]))
+        simd().then((res) => {
+          console.log("simd check", res);
+        });
+
+        $(function(){
+            
+            // watch dom change
+            window.setTimeout(function(){
+                // const socket = io();
+                console.log("============== watch =============");
+                const target = document.querySelector("div.speaker-bar-container__horizontal-view-wrap");
+                console.log(target);
+                const observer = new MutationObserver(mutations => {
+
+                    const newActiveSpeakerNode = mutations.filter(node => (
+                        $(node['target']).attr('class') === 'speaker-bar-container__video-frame speaker-bar-container__video-frame--active'
+                    ))
+
+                    if (newActiveSpeakerNode.length > 0){
+                        const activeSpeakerName = $(newActiveSpeakerNode[0]['target']).find('span').text()
+                        console.log(activeSpeakerName);
+
+                        const today = new Date();
+                        const timestamp = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+
+                        const activeSpeakerInfo = {
+                            "active_speaker_name": activeSpeakerName,
+                            "timestamp": timestamp
+                        }
+
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', 'http://localhost:3000/api/zoom/active_speaker');
+                        xhr.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+                        xhr.send(JSON.stringify(activeSpeakerInfo));
+                    }
+
+                    // const newActiveSpeakerNode = mutations.filter(node => (
+                    //     $(node['target']).attr('class') === 'speaker-bar-container__video-frame speaker-bar-container__video-frame--active'
+                    // ))
+
+                })
+
+                const config = { attributes: true, attributeFilter: ['class'], subtree: true, attributedOldValue: true};
+                observer.observe(target, config);
+
+            }, 5000);
+
+            // window.setTimeout(function(){
+            //     console.log("!!!!!! Leaving meeting... !!!!!!!");
+            //     // const root = $('div#zmmtg-root').find('button.leave-meeting-options__btn--danger')
+            //     const root = $('div#zmmtg-root').find('button.footer__leave-btn')
+            //     console.log(root);
+            //     // When leave meeting
+            //     $('button.leave-meeting-options__btn--danger').click(() => {
+            //         const today = new Date();
+            //         const timestamp = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+
+            //         const meetingEndInfo = {
+            //             'datetime_end': timestamp
+            //         }
+
+            //         var xhr = new XMLHttpRequest();
+            //         xhr.open('POST', 'http://localhost:3000/api/zoom/meeting_end');
+            //         xhr.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+            //         xhr.send(JSON.stringify(meetingEndInfo));
+            //     })
+            // }, 10000);
+
+        });
+    </script>
+</body>
+</html>
