@@ -64,7 +64,7 @@ function beginJoin(signature) {
           ZoomMtg.getAttendeeslist({
             success: function (res) {
               // TODO: send data to the server
-              console.log("success!!", res.result);
+              // console.log("success!!", res.result);
               const attendeesList = JSON.stringify(res.result.attendeesList);
               // const attendeesList = JSON.stringify(res.result);
               console.log(attendeesList);
@@ -75,7 +75,7 @@ function beginJoin(signature) {
               const meetingInfo = {
                 "meeting_id": meetingConfig.meetingNumber,
                 "datetime_start": captureStart,
-                "attendeesList": attendeesList
+                "attendees_list": attendeesList
               }
 
               console.log(meetingInfo);
