@@ -86,11 +86,11 @@ function beginJoin(signature) {
               xhr.send(JSON.stringify(meetingInfo));
             },
           });
-          ZoomMtg.getCurrentUser({
-            success: function (res) {
-              console.log("success getCurrentUser", res.result.currentUser);
-            },
-          });
+          // ZoomMtg.getCurrentUser({
+          //   success: function (res) {
+          //     console.log("success getCurrentUser", res.result.currentUser);
+          //   },
+          // });
         },
         error: function (res) {
           console.log(res);
@@ -123,6 +123,9 @@ function beginJoin(signature) {
       const meetingEndInfo = {
           'datetime_end': timestamp
       }
+
+      console.log(">>>>>>>>>>>> Leaving from the meeting....");
+      console.log(meetingEndInfo);
 
       var xhr = new XMLHttpRequest();
       xhr.open('POST', 'http://localhost:3000/api/zoom/meeting_end');

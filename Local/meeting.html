@@ -31,47 +31,38 @@
         });
 
         $(function(){
-            
-            // watch dom change
             window.setTimeout(function(){
-                // const socket = io();
-                console.log("============== watch =============");
-                const target = document.querySelector("div.speaker-bar-container__horizontal-view-wrap");
-                console.log(target);
+                const target = $("body").get(0);
                 const observer = new MutationObserver(mutations => {
-
-                    const newActiveSpeakerNode = mutations.filter(node => (
-                        $(node['target']).attr('class') === 'speaker-bar-container__video-frame speaker-bar-container__video-frame--active'
+                    const newNodes = mutations.filter(node => (
+                        $(node['target']).attr('class') === 'video-avatar__avatar-name'
                     ))
 
-                    if (newActiveSpeakerNode.length > 0){
-                        const activeSpeakerName = $(newActiveSpeakerNode[0]['target']).find('span').text()
-                        console.log(activeSpeakerName);
+                    if (newNodes.length > 0){
+                        const activeSpeakerName = $(newNodes[0]['target']).text()
+                        if (activeSpeakerName != ""){
+                            const today = new Date();
+                            const timestamp = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
 
-                        const today = new Date();
-                        const timestamp = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+                            const activeSpeakerInfo = {
+                                "active_speaker_name": activeSpeakerName,
+                                "timestamp": timestamp
+                            }
+                            console.log("===== New active speaker detected ========")
+                            console.log(activeSpeakerInfo);
 
-                        const activeSpeakerInfo = {
-                            "active_speaker_name": activeSpeakerName,
-                            "timestamp": timestamp
+                            var xhr = new XMLHttpRequest();
+                            xhr.open('POST', 'http://localhost:3000/api/zoom/active_speaker');
+                            xhr.setRequestHeader('content-type', 'application/json;charset=UTF-8');
+                            xhr.send(JSON.stringify(activeSpeakerInfo));
                         }
-
-                        var xhr = new XMLHttpRequest();
-                        xhr.open('POST', 'http://localhost:3000/api/zoom/active_speaker');
-                        xhr.setRequestHeader('content-type', 'application/json;charset=UTF-8');
-                        xhr.send(JSON.stringify(activeSpeakerInfo));
                     }
-
-                    // const newActiveSpeakerNode = mutations.filter(node => (
-                    //     $(node['target']).attr('class') === 'speaker-bar-container__video-frame speaker-bar-container__video-frame--active'
-                    // ))
-
                 })
 
-                const config = { attributes: true, attributeFilter: ['class'], subtree: true, attributedOldValue: true};
+                const config = { characterData: true, childList: true, subtree: true};
                 observer.observe(target, config);
 
-            }, 5000);
+            }, 8000);
 
             // window.setTimeout(function(){
             //     console.log("!!!!!! Leaving meeting... !!!!!!!");
